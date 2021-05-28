@@ -26,7 +26,7 @@ namespace VoxelMultiplayer.Network
 
         public static byte[] currentMapData;
 
-        public void Start ()
+        public void Start()
         {
             Listener = new EventBasedNetListener();
             Manager = new NetManager(Listener);

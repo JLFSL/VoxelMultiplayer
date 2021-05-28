@@ -33,7 +33,7 @@ namespace LiteNetLib
 
         static NetPacket()
         {
-            HeaderSizes = new int[LastProperty+1];
+            HeaderSizes = new int[LastProperty + 1];
             for (int i = 0; i < HeaderSizes.Length; i++)
             {
                 switch ((PacketProperty)i)
@@ -74,7 +74,7 @@ namespace LiteNetLib
         public byte ConnectionNumber
         {
             get { return (byte)((RawData[0] & 0x60) >> 5); }
-            set { RawData[0] = (byte) ((RawData[0] & 0x9F) | (value << 5)); }
+            set { RawData[0] = (byte)((RawData[0] & 0x9F) | (value << 5)); }
         }
 
         public ushort Sequence
@@ -186,7 +186,7 @@ namespace LiteNetLib
         {
             return BitConverter.ToInt32(packet.RawData, 1);
         }
-        
+
         public static NetConnectRequestPacket FromData(NetPacket packet)
         {
             if (packet.ConnectionNumber >= NetConstants.MaxConnectionNumber)
@@ -194,7 +194,7 @@ namespace LiteNetLib
 
             //Getting new id for peer
             long connectionId = BitConverter.ToInt64(packet.RawData, 5);
-            
+
             //Get target address
             int addrSize = packet.RawData[13];
             if (addrSize != 16 && addrSize != 28)
@@ -204,7 +204,7 @@ namespace LiteNetLib
 
             // Read data and create request
             var reader = new NetDataReader(null, 0, 0);
-            if (packet.Size > HeaderSize+addrSize)
+            if (packet.Size > HeaderSize + addrSize)
                 reader.SetSource(packet.RawData, HeaderSize + addrSize, packet.Size);
 
             return new NetConnectRequestPacket(connectionId, packet.ConnectionNumber, addressBytes, reader);
@@ -213,15 +213,15 @@ namespace LiteNetLib
         public static NetPacket Make(NetDataWriter connectData, SocketAddress addressBytes, long connectId)
         {
             //Make initial packet
-            var packet = new NetPacket(PacketProperty.ConnectRequest, connectData.Length+addressBytes.Size);
+            var packet = new NetPacket(PacketProperty.ConnectRequest, connectData.Length + addressBytes.Size);
 
             //Add data
             FastBitConverter.GetBytes(packet.RawData, 1, NetConstants.ProtocolId);
             FastBitConverter.GetBytes(packet.RawData, 5, connectId);
             packet.RawData[13] = (byte)addressBytes.Size;
             for (int i = 0; i < addressBytes.Size; i++)
-                packet.RawData[14+i] = addressBytes[i];
-            Buffer.BlockCopy(connectData.Data, 0, packet.RawData, 14+addressBytes.Size, connectData.Length);
+                packet.RawData[14 + i] = addressBytes[i];
+            Buffer.BlockCopy(connectData.Data, 0, packet.RawData, 14 + addressBytes.Size, connectData.Length);
             return packet;
         }
     }

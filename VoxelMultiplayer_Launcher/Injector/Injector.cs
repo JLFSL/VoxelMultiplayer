@@ -201,8 +201,9 @@ namespace SharpMonoInjector
                 _memory.AllocateAndWrite(assembly), (IntPtr)assembly.Length, (IntPtr)1, statusPtr);
 
             MonoImageOpenStatus status = (MonoImageOpenStatus)_memory.ReadInt(statusPtr);
-            
-            if (status != MonoImageOpenStatus.MONO_IMAGE_OK) {
+
+            if (status != MonoImageOpenStatus.MONO_IMAGE_OK)
+            {
                 IntPtr messagePtr = Execute(Exports[mono_image_strerror], (IntPtr)status);
                 string message = _memory.ReadString(messagePtr, 256, Encoding.UTF8);
                 throw new InjectorException($"{mono_image_open_from_data}() failed: {message}");
@@ -219,7 +220,8 @@ namespace SharpMonoInjector
 
             MonoImageOpenStatus status = (MonoImageOpenStatus)_memory.ReadInt(statusPtr);
 
-            if (status != MonoImageOpenStatus.MONO_IMAGE_OK) {
+            if (status != MonoImageOpenStatus.MONO_IMAGE_OK)
+            {
                 IntPtr messagePtr = Execute(Exports[mono_image_strerror], (IntPtr)status);
                 string message = _memory.ReadString(messagePtr, 256, Encoding.UTF8);
                 throw new InjectorException($"{mono_assembly_load_from_full}() failed: {message}");
@@ -275,7 +277,8 @@ namespace SharpMonoInjector
 
             IntPtr exc = (IntPtr)_memory.ReadInt(excPtr);
 
-            if (exc != IntPtr.Zero) {
+            if (exc != IntPtr.Zero)
+            {
                 string className = GetClassName(exc);
                 string message = ReadMonoString((IntPtr)_memory.ReadInt(exc + (Is64Bit ? 0x20 : 0x10)));
                 throw new InjectorException($"The managed method threw an exception: ({className}) {message}");
@@ -329,7 +332,8 @@ namespace SharpMonoInjector
         {
             Assembler asm = new Assembler();
 
-            if (_attach) {
+            if (_attach)
+            {
                 asm.Push(_rootDomain);
                 asm.MovEax(Exports[mono_thread_attach]);
                 asm.CallEax();
@@ -354,7 +358,8 @@ namespace SharpMonoInjector
 
             asm.SubRsp(40);
 
-            if (_attach) {
+            if (_attach)
+            {
                 asm.MovRax(Exports[mono_thread_attach]);
                 asm.MovRcx(_rootDomain);
                 asm.CallRax();
@@ -362,8 +367,10 @@ namespace SharpMonoInjector
 
             asm.MovRax(functionPtr);
 
-            for (int i = 0; i < args.Length; i++) {
-                switch (i) {
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (i)
+                {
                     case 0:
                         asm.MovRcx(args[i]);
                         break;

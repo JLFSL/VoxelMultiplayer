@@ -25,7 +25,7 @@ namespace VoxelMultiplayer
 		private void Update()
 		{
 			if (!firstLoad && VoxelTycoon.SceneControl.SceneController.Current.Loaded)
-            {
+			{
 				Debug.Log("Client: Showing multiplayer menu");
 
 				VoxelTycoon.UI.UIManager.Current.CreateFrame<VoxelMultiplayer.Game.MultiplayerMenu.UI.MultiplayerMenuFrame>(VoxelTycoon.UI.FrameAnchoring.Fullscreen).Show();
@@ -34,7 +34,7 @@ namespace VoxelMultiplayer
 			}
 
 			if (firstLoad && !serverStarted && newGame)
-            {
+			{
 				Debug.LogWarning("Client.Update(): Starting Local Server");
 				host = new Network.Server();
 				Thread server = new Thread(new ThreadStart(host.Start));
@@ -75,7 +75,7 @@ namespace VoxelMultiplayer
 			}
 
 			if (Input.GetKeyUp(KeyCode.F6))
-            {
+			{
 				/* Unfortunately only sends metadata instead of a whole save. Took me way too long to figure this out.
 				 * 
 				 * VoxelTycoon.Serialization.ExtendedSaveMetadata data = Game.Serialization.SaveManager.CreateMetadataForCurrentState("tempsave");
@@ -89,9 +89,9 @@ namespace VoxelMultiplayer
 			}
 
 			if (Input.GetKeyUp(KeyCode.F7))
-            {
+			{
 				Debug.LogError(Newtonsoft.Json.JsonConvert.SerializeObject(VoxelTycoon.Serialization.SaveSerializer.Current));
-            }
+			}
 		}
 	}
 }

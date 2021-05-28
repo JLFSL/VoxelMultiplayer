@@ -36,7 +36,7 @@ namespace VoxelMultiplayer
                     Injector injector = new Injector(process.Id);
                     remoteAssembly = injector.Inject(assembly, @namespace, className, methodName);
 
-                    
+
 
                     Environment.Exit(0);
                 }
@@ -50,8 +50,8 @@ namespace VoxelMultiplayer
                     System.Console.WriteLine("Failed to inject assembly (system error): " + e);
                     Console.ReadLine();
                 }
-            } 
-            catch 
+            }
+            catch
             {
                 Console.WriteLine("Could not find " + assemblyPath);
                 Console.ReadLine();

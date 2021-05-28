@@ -245,14 +245,14 @@ namespace LiteNetLib
             bool dualMode = ipv6Mode == IPv6Mode.DualMode && IPv6Support;
 
             _udpSocketv4 = new Socket(
-                dualMode ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork, 
-                SocketType.Dgram, 
+                dualMode ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork,
+                SocketType.Dgram,
                 ProtocolType.Udp);
 
             if (!BindSocket(_udpSocketv4, new IPEndPoint(dualMode ? addressIPv6 : addressIPv4, port), reuseAddress, ipv6Mode))
                 return false;
 
-            LocalPort = ((IPEndPoint) _udpSocketv4.LocalEndPoint).Port;
+            LocalPort = ((IPEndPoint)_udpSocketv4.LocalEndPoint).Port;
 
 #if UNITY_IOS && !UNITY_EDITOR
             if (_unitySocketFix == null)
@@ -378,7 +378,7 @@ namespace LiteNetLib
                         //Disable IPv6 only mode
                         socket.SetSocketOption(SocketOptionLevel.IPv6, (SocketOptionName)27, false);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         NetDebug.WriteError("[B]Bind exception (dualmode setting): {0}", e.ToString());
                     }
@@ -430,7 +430,7 @@ namespace LiteNetLib
                                 //because its fixed in 2018_3
                                 NetDebug.WriteError("[B]Bind exception: {0}, errorCode: {1}", ex.ToString(), ex.SocketErrorCode);
 #else
-                            catch(SocketException)
+                            catch (SocketException)
                             {
 #endif
                                 return false;

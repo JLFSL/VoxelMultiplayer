@@ -27,40 +27,40 @@ using HarmonyLib;
 
 namespace VoxelMultiplayer
 {
-	public class Core
-	{
-		public static GameObject Multiplayer;
-		public static GameObject Logger;
+    public class Core
+    {
+        public static GameObject Multiplayer;
+        public static GameObject Logger;
 
-		private static Harmony Patcher;
+        private static Harmony Patcher;
 
-		public static void Load()
-		{
-			Debug.Log("Load(): Adding GameObject: Multiplayer");
-			Core.Multiplayer = new GameObject();
-			Multiplayer.AddComponent<Client>();
-			UnityEngine.Object.DontDestroyOnLoad(Multiplayer);
+        public static void Load()
+        {
+            Debug.Log("Load(): Adding GameObject: Multiplayer");
+            Core.Multiplayer = new GameObject();
+            Multiplayer.AddComponent<Client>();
+            UnityEngine.Object.DontDestroyOnLoad(Multiplayer);
 
-			Debug.Log("Load(): Adding GameObject: Logger");
-			Core.Logger = new GameObject();
-			Logger.AddComponent<Utils.Console>();
-			UnityEngine.Object.DontDestroyOnLoad(Logger);
+            Debug.Log("Load(): Adding GameObject: Logger");
+            Core.Logger = new GameObject();
+            Logger.AddComponent<Utils.Console>();
+            UnityEngine.Object.DontDestroyOnLoad(Logger);
 
-			Debug.Log("Load(): Initializing Patcher");
-			Patcher = new Harmony("com.VoxelMultiplayer.VoxelMultiplayer.GamePatcher");
-			Debug.Log("Load(): Patching Game Functions");
-			Patcher.PatchAll();
-		}
+            Debug.Log("Load(): Initializing Patcher");
+            Patcher = new Harmony("com.VoxelMultiplayer.VoxelMultiplayer.GamePatcher");
+            Debug.Log("Load(): Patching Game Functions");
+            Patcher.PatchAll();
+        }
 
-		public static void Unload()
-		{
-			Debug.Log("Unload(): Destroying GameObject: Multiplayer");
-			GameObject.Destroy(Core.Multiplayer);
-			Debug.Log("Unload(): Destroying GameObject: Logger");
-			GameObject.Destroy(Core.Logger);
+        public static void Unload()
+        {
+            Debug.Log("Unload(): Destroying GameObject: Multiplayer");
+            GameObject.Destroy(Core.Multiplayer);
+            Debug.Log("Unload(): Destroying GameObject: Logger");
+            GameObject.Destroy(Core.Logger);
 
-			Debug.Log("Unload(): Unpatching Game Functions");
-			Patcher.UnpatchAll();
-		}
-	}
+            Debug.Log("Unload(): Unpatching Game Functions");
+            Patcher.UnpatchAll();
+        }
+    }
 }

@@ -25,7 +25,7 @@ namespace LiteNetLib.Utils
                 uint res = i;
                 for (int t = 0; t < 16; t++)
                 {
-                    for (int k = 0; k < 8; k++) 
+                    for (int k = 0; k < 8; k++)
                         res = (res & 1) == 1 ? Poly ^ (res >> 1) : (res >> 1);
                     Table[t * 256 + i] = res;
                 }

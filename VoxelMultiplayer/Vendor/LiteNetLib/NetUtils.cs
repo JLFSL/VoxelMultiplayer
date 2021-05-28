@@ -29,9 +29,9 @@ namespace LiteNetLib
 
         public static IPAddress ResolveAddress(string hostStr)
         {
-            if(hostStr == "localhost")
+            if (hostStr == "localhost")
                 return IPAddress.Loopback;
-            
+
             IPAddress ipAddress;
             if (!IPAddress.TryParse(hostStr, out ipAddress))
             {
@@ -97,7 +97,7 @@ namespace LiteNetLib
                 foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
                 {
                     //Skip loopback and disabled network interfaces
-                    if (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback || 
+                    if (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
                         ni.OperationalStatus != OperationalStatus.Up)
                         continue;
 
@@ -127,16 +127,16 @@ namespace LiteNetLib
                 IPAddress[] addresses = ResolveAddresses(Dns.GetHostName());
                 foreach (IPAddress ip in addresses)
                 {
-                    if((ipv4 && ip.AddressFamily == AddressFamily.InterNetwork) ||
+                    if ((ipv4 && ip.AddressFamily == AddressFamily.InterNetwork) ||
                        (ipv6 && ip.AddressFamily == AddressFamily.InterNetworkV6))
                         targetList.Add(ip.ToString());
                 }
             }
             if (targetList.Count == 0)
             {
-                if(ipv4)
+                if (ipv4)
                     targetList.Add("127.0.0.1");
-                if(ipv6)
+                if (ipv6)
                     targetList.Add("::1");
             }
         }

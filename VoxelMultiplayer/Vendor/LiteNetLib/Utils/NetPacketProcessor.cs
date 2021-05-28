@@ -29,7 +29,7 @@ namespace LiteNetLib.Utils
         //FNV-1 64 bit hash
         protected virtual ulong GetHash<T>()
         {
-            if(HashCache<T>.Initialized)
+            if (HashCache<T>.Initialized)
                 return HashCache<T>.Id;
 
             ulong hash = 14695981039346656037UL; //offset
@@ -256,7 +256,7 @@ namespace LiteNetLib.Utils
         }
 
         public void SubscribeNetSerializable<T, TUserData>(
-            Action<T, TUserData> onReceive, 
+            Action<T, TUserData> onReceive,
             Func<T> packetConstructor) where T : INetSerializable
         {
             _callbacks[GetHash<T>()] = (reader, userData) =>

@@ -21,7 +21,8 @@ namespace SharpMonoInjector
         {
             List<byte> bytes = new List<byte>();
 
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; i++)
+            {
                 byte read = ReadBytes(address + bytes.Count, 1)[0];
 
                 if (read == 0x00)
