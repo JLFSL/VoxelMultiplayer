@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VoxelMultiplayer": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Jimmy\\Source\\Repos\\VoxelMultiplayer\\bin\\net471\\VoxelMultiplayer.exe"
+    }
+  }
+}
