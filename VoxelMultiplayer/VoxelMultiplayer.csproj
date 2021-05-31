@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Game\Modding\**" />
+    <EmbeddedResource Remove="Game\Modding\**" />
+    <None Remove="Game\Modding\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\Desktop\Harmony.2.0.4.0\net45\0Harmony.dll</HintPath>
     </Reference>

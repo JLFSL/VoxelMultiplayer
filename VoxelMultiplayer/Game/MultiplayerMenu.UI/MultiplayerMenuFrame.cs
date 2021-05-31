@@ -45,7 +45,7 @@ namespace VoxelMultiplayer.Game.MultiplayerMenu.UI
             this._images.Shuffle<Texture>((int)DateTime.Now.Ticks);
             this.BreakBatch = BatchBreakBehavior.BreakAfter;
             Transform transform = UnityEngine.Object.Instantiate<CanvasRenderer>(R.MainMenu.UI.MainMenuContent, this.transform).transform;
-            transform.transform.Find<UnityEngine.UI.Text>("Menu/LogoWrapper/Logo/Subtitle").text = S.EarlyAccess.ToUpper();
+            transform.transform.Find<UnityEngine.UI.Text>("Menu/LogoWrapper/Logo/Subtitle").text = "Co-Op/Multiplayer";
             this._background1 = transform.Find<RawImage>("Background1");
             this._background2 = transform.Find<RawImage>("Background2");
             this._menuItemsContainer = transform.Find("Menu/Items");

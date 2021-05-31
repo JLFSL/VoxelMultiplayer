@@ -31,5 +31,14 @@ namespace VoxelMultiplayer.Game.Tools.Builder
                 }
             }
         }
+
+        [HarmonyPatch(typeof(VoxelTycoon.Tools.Builder.BuilderTool), "BuildGhost")]
+        class Patch2
+        {
+            static void Postfix(VoxelTycoon.Tools.Builder.BuilderTool __instance)
+            {
+                Debug.LogError("Patcher Postfix: BuilderTool.BuildGhost " + __instance.Recipe.Building.ToString());
+            }
+        }
     }
 }

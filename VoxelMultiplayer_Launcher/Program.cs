@@ -5,9 +5,6 @@ using System.Threading;
 
 using SharpMonoInjector;
 
-[DllImport("user32.dll")]
-static extern int SetWindowText(IntPtr hWnd, string text);
-
 namespace VoxelMultiplayer
 {
     class Program
@@ -31,12 +28,10 @@ namespace VoxelMultiplayer
                 {
                     Process process = Process.Start("VoxelTycoon.exe");
 
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1000);
 
                     Injector injector = new Injector(process.Id);
                     remoteAssembly = injector.Inject(assembly, @namespace, className, methodName);
-
-
 
                     Environment.Exit(0);
                 }
