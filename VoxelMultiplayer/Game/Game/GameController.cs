@@ -169,8 +169,7 @@ namespace VoxelMultiplayer.Game.Game
 
             Debug.Log((object)string.Format("Seed: {0} ({1})", (object)VoxelTycoon.WorldSettings.Current.SeedString, (object)VoxelTycoon.WorldSettings.Current.Seed));
 
-            this.ProgressReporter.OnSceneLoaded();
-            VoxelTycoon.Game.GameUI.Current.Show();
+            // Since the game won't do it for us automatically for some reason
             this.OnLoaded();
         }
 
@@ -182,6 +181,7 @@ namespace VoxelMultiplayer.Game.Game
         protected override void OnLoaded()
         {
             base.OnLoaded();
+            this.ProgressReporter.OnSceneLoaded();
             VoxelTycoon.Game.GameUI.Current.Show();
         }
 
