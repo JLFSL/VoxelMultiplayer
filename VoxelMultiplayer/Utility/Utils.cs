@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -23,7 +24,7 @@ namespace VoxelMultiplayer.Utility
             return method?.Invoke(obj, methodParams);
         }
 
-        public static object GetValueForField(object classObj, string fieldName, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic)
+        public static object GetValueForField(object classObj, string fieldName, BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
         {
             Debug.LogError(classObj + " " + fieldName + " " + bindingFlags);
             
@@ -31,6 +32,33 @@ namespace VoxelMultiplayer.Utility
             Debug.LogError(test);
 
             return classObj.GetType().GetField(fieldName, bindingFlags).GetValue(classObj);
+        }
+
+        public static void SetValueForField(object classObj, string fieldName, object value, BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+        {
+            Debug.LogError(classObj + " " + fieldName + " " + bindingFlags);
+
+            FieldInfo test = classObj.GetType().GetField(fieldName, bindingFlags);
+            Debug.LogError(test);
+
+            classObj.GetType().GetField(fieldName, bindingFlags).SetValue(classObj, value);
+        }
+
+        public static bool ByteArrayToFile(string fileName, byte[] byteArray)
+        {
+            try
+            {
+                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    fs.Write(byteArray, 0, byteArray.Length);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Exception caught in process: " + ex);
+                return false;
+            }
         }
     }
 }

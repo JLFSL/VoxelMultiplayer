@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoxelMultiplayer", "VoxelMultiplayer\VoxelMultiplayer.csproj", "{BA292E8C-F7E3-4073-AA72-FD2DF4C58403}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C24BFBFD-7195-4506-884F-05D30E7E949B} = {C24BFBFD-7195-4506-884F-05D30E7E949B}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelMultiplayer_Launcher", "VoxelMultiplayer_Launcher\VoxelMultiplayer_Launcher.csproj", "{C24BFBFD-7195-4506-884F-05D30E7E949B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoxelMultiplayer_Launcher", "VoxelMultiplayer_Launcher\VoxelMultiplayer_Launcher.csproj", "{C24BFBFD-7195-4506-884F-05D30E7E949B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +30,7 @@ Global
 		{BA292E8C-F7E3-4073-AA72-FD2DF4C58403}.Release|x86.ActiveCfg = Release|x64
 		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Debug|x64.ActiveCfg = Debug|x64
+		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Debug|x64.Build.0 = Debug|x64
 		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Debug|x86.ActiveCfg = Debug|x64
 		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Release|Any CPU.ActiveCfg = Release|x64
 		{C24BFBFD-7195-4506-884F-05D30E7E949B}.Release|x64.ActiveCfg = Release|x64

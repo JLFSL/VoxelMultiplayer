@@ -1,20 +1,19 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Linq;
 
 using UnityEngine;
 
 using LiteNetLib;
-using System.Collections.Generic;
+using LiteNetLib.Utils;
 
 namespace VoxelMultiplayer.Network
 {
-    public class Client
+    public class Client : MonoBehaviour
     {
         private static EventBasedNetListener Listener;
         private static NetManager Manager;
+        private static NetPacketProcessor Processor;
 
         private readonly string Host = "localhost";
         private readonly int Port = 23020;
@@ -25,76 +24,42 @@ namespace VoxelMultiplayer.Network
         public bool closeConnection = false;
 
         public static byte[] currentMapData;
+        public static FileInfo _file;
 
-        public void Start()
+        private void Start()
         {
+            Debug.LogWarning("Client.Update(): Connecting to Local Server");
+
             Listener = new EventBasedNetListener();
             Manager = new NetManager(Listener);
+            Processor = new NetPacketProcessor();
 
             Manager.Start();
             Manager.Connect(Host, Port, Key);
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                Debug.LogError(dataReader.AvailableBytes);
-                int length = dataReader.GetInt();
-                Debug.LogError(dataReader.AvailableBytes + " " + length);
-                //dataReader.GetBytes(currentMapData, length);
-
-                currentMapData = dataReader.GetRemainingBytes();
-
-                Debug.LogError(currentMapData.Length);
-
-                string tempname = "mp" + ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds().ToString() + ".sav";
-
-                if (currentMapData != null)
-                {
-                    string dirFile = VoxelTycoon.Serialization.SaveManager.SavesDirectory + @"\" + tempname;
-                    Debug.LogError(VoxelTycoon.Serialization.SaveManager.SavesDirectory + " " + dirFile);
-
-                    if (ByteArrayToFile(dirFile, currentMapData))
-                    {
-                        FileInfo file = new FileInfo(dirFile);
-                        Debug.LogError(file.FullName);
-
-                        VoxelTycoon.Serialization.SaveMetadata save = VoxelTycoon.Serialization.SaveSerializer.ReadMetadata<VoxelTycoon.Serialization.SaveMetadata>(file.FullName);
-
-                        VoxelTycoon.Game.UI.LoadGameHelper.TryLoad(VoxelTycoon.Serialization.SaveManager.GetFullMetadata(save));
-                    }
-                }
+                Processor.ReadAllPackets(dataReader, fromPeer);
 
                 dataReader.Recycle();
             };
 
-            while (true)
+            Processor.SubscribeReusable<Packets.MapData>((data) =>
             {
-                Manager.PollEvents();
-                Thread.Sleep(15);
-
-                if (closeConnection)
-                    break;
-            }
+                data.LoadMap();
+            });
         }
 
-        public void Stop()
+        private void Stop()
         {
-            closeConnection = true;
+            Manager.Stop();
         }
 
-        public bool ByteArrayToFile(string fileName, byte[] byteArray)
+        private void Update()
         {
-            try
-            {
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                {
-                    fs.Write(byteArray, 0, byteArray.Length);
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("Exception caught in process: " + ex);
-                return false;
-            }
+            Manager.PollEvents();
+
+            if (closeConnection)
+                Stop();
         }
     }
 }

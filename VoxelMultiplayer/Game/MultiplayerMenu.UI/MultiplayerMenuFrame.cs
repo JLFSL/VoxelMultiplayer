@@ -127,9 +127,10 @@ namespace VoxelMultiplayer.Game.MultiplayerMenu.UI
 
         private void JoinGame()
         {
-            Debug.LogWarning("Client.Update(): Connecting to Local Server");
-            Thread client = new Thread(new ThreadStart(new Network.Client().Start));
-            client.Start();
+            Debug.Log("Update(): Adding GameObject: Client");
+            Client.client = new GameObject();
+            Client.client.AddComponent<Network.Client>();
+            UnityEngine.Object.DontDestroyOnLoad(Client.client);
         }
 
         private void Quit() => Helper.Quit();

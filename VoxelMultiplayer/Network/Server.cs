@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.Threading;
 
 using UnityEngine;
 
@@ -10,24 +7,26 @@ using LiteNetLib.Utils;
 
 namespace VoxelMultiplayer.Network
 {
-    public class Server
+    public class Server : MonoBehaviour
     {
         private static EventBasedNetListener Listener;
         private static NetManager Manager;
+        private static NetPacketProcessor Processor;
 
         private readonly int Port = 23020;
         private readonly int maxConnected = 1;
         private readonly string Key = "";
 
         public bool closeConnection = false;
+        private static byte[] CurrentMapData { get; set; }
 
-        //private string currentMapData { get; set; }
-        private byte[] CurrentMapData { get; set; }
-
-        public void Start()
+        private void Start()
         {
+            Debug.LogWarning("Server.Start(): Starting Local Server");
+
             Listener = new EventBasedNetListener();
             Manager = new NetManager(Listener);
+            Processor = new NetPacketProcessor();
 
             Manager.Start(Port);
 
@@ -42,33 +41,24 @@ namespace VoxelMultiplayer.Network
             Listener.PeerConnectedEvent += peer =>
             {
                 Debug.LogWarning("We got connection: " + peer.EndPoint); // Show peer ip
-                NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                //writer.Put("Hello client!");                                // Put some string
 
-                //Debug.LogError(currentMapData);
-                writer.Put(CurrentMapData.Length);
-                writer.Put(CurrentMapData);
-
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                Processor.Send(peer, new Packets.MapData() { Length = CurrentMapData.Length, Data = CurrentMapData }, DeliveryMethod.ReliableOrdered);
             };
+        }
 
-            while (true)
-            {
-                Manager.PollEvents();
-                Thread.Sleep(15);
-
-                if (closeConnection)
-                    break;
-            }
-
+        private void Stop()
+        {
             Manager.Stop();
         }
 
-        public void Stop()
+        private void Update()
         {
-            closeConnection = true;
+            Manager.PollEvents();
+
+            if (closeConnection)
+                Stop();
         }
 
-        public bool ReceiveLatestMap(byte[] data) { if (data != null) { CurrentMapData = data; return true; } else return false; }
+        public static bool ReceiveLatestMap(byte[] data) { if (data != null) { CurrentMapData = data; return true; } else return false; }
     }
 }

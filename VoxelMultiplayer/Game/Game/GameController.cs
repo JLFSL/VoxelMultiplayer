@@ -91,11 +91,12 @@ namespace VoxelMultiplayer.Game.Game
             Utility.Utils.InvokeMethod(VoxelTycoon.LazyManager<VoxelTycoon.Modding.ModManager>.Current, "OnGameStarting");
             try
             {
-                //if (VoxelTycoon.Serialization.SaveManager.LoadingMetadata == null)
-                //   newGame = false;
+                if (VoxelTycoon.Serialization.SaveManager.LoadingMetadata != null)
+                {
+                    newGame = false;
 
-                // can't get this to work? - VoxelTycoon.Serialization.SaveManager.LoadInternal
-                newGame = true;
+                    VoxelTycoon.Serialization.SaveSerializer.Read(VoxelTycoon.Serialization.SaveManager.SavesDirectory + "/" + VoxelTycoon.Serialization.SaveManager.LoadingMetadata.Filename, VoxelTycoon.Serialization.SaveManager.GetFullMetadata(VoxelTycoon.Serialization.SaveManager.LoadingMetadata));
+                }
             }
             catch (Exception ex)
             {
