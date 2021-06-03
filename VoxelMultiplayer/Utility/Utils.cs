@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reflection;
 
+using UnityEngine;
+
 namespace VoxelMultiplayer.Utility
 {
     class Utils
@@ -19,6 +21,16 @@ namespace VoxelMultiplayer.Utility
             }
 
             return method?.Invoke(obj, methodParams);
+        }
+
+        public static object GetValueForField(object classObj, string fieldName, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic)
+        {
+            Debug.LogError(classObj + " " + fieldName + " " + bindingFlags);
+            
+            FieldInfo test = classObj.GetType().GetField(fieldName, bindingFlags);
+            Debug.LogError(test);
+
+            return classObj.GetType().GetField(fieldName, bindingFlags).GetValue(classObj);
         }
     }
 }

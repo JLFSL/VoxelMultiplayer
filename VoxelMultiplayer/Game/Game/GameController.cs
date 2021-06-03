@@ -1,28 +1,186 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 
 namespace VoxelMultiplayer.Game.Game
 {
-    class GameController
+    class GameController : VoxelTycoon.SceneControl.SceneController
     {
-        [HarmonyPatch(typeof(VoxelTycoon.Game.GameController), "Bootstrap")]
-        class Bootstrap
+        private static VoxelTycoon.Game.GameController _gameController;
+
+        public override IEnumerator Bootstrap()
         {
-            static void Prefix(VoxelTycoon.Game.GameController __instance)
+            Debug.LogError("test");
+
+            VoxelTycoon.Game.GameController gameController = _gameController;
+
+            VoxelTycoon.Integrations.Steam.SteamManager.CreateSafe();
+            VoxelTycoon.Integrations.Discord.DiscordManager.InitializeSafe();
+
+            VoxelTycoon.Manager<VoxelTycoon.Audio.SoundManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.CountersManager>.Initialize();
+
+            this.SetupUI();
+
+            VoxelTycoon.Manager<VoxelTycoon.LightingManager>.Initialize();
+
+            GC.Collect();
+
+            AsyncOperation op = UnityEngine.Resources.UnloadUnusedAssets();
+
+            while (!op.isDone)
+                yield return (object)null;
+
+            VoxelTycoon.DebugSettings.Load();
+            VoxelTycoon.DebugSettings.IgnoreRegions = false;
+            VoxelTycoon.Manager<VoxelTycoon.AssetLibrary>.Initialize();
+            IEnumerable<VoxelTycoon.AssetManagement.Pack> enabledPacks = VoxelTycoon.AssetManagement.EnabledPacksPerSaveHelper.GetEnabledPacks();
+            VoxelTycoon.AssetLibraryHelper.RegisterHandlers();
+            try
             {
-                Debug.Log("Patcher Prefix: Bootstrap");
+                new VoxelTycoon.Modding.ModLoader().Load(enabledPacks);
+            }
+            catch (Exception ex)
+            {
+                this.ProgressReporter.ReportException(ex);
+            }
+            yield return Utility.Utils.InvokeMethod(VoxelTycoon.Manager<VoxelTycoon.AssetLibrary>.Current, "Load", this.ProgressReporter, enabledPacks);
+            try
+            {
+                VoxelTycoon.LazyManager<VoxelTycoon.Tracks.VehicleUnitManager>.Current.OnAssetsLoaded();
+                VoxelTycoon.LazyManager<VoxelTycoon.Tracks.VehicleRecipeManager>.Current.OnAssetsLoaded();
+                VoxelTycoon.LazyManager<VoxelTycoon.Researches.ResearchManager>.Current.OnAssetsLoaded();
+                VoxelTycoon.LazyManager<VoxelTycoon.Cities.CityStoreSpawnInfoManager>.Current.OnAssetsLoaded();
+            }
+            catch (Exception ex)
+            {
+               this.ProgressReporter.ReportException(new Exception("Can't finalize asset loading", ex));
             }
 
-            static void Postfix(VoxelTycoon.Game.GameController __instance)
+            Utility.Utils.InvokeMethod(VoxelTycoon.Game.GameUI.Current, "OnLocalizationReady", null);
+            VoxelTycoon.Manager<VoxelTycoon.Game.UI.UIFormat>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.BiomeManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.RecipeManager>.Initialize();
+            if (VoxelTycoon.Serialization.SaveManager.LoadingMetadata != null)
             {
-                Debug.Log("Patcher Postfix: Bootstrap");
+                this.ProgressReporter.ReportOperationStarted((string)VoxelTycoon.S.PreloaderLoadingSavedGame);
+                yield return (object)null;
+            }
+            VoxelTycoon.Manager<VoxelTycoon.WindManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.WorldManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Tracks.Conveyors.CargoManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Notifications.NotificationManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Game.UI.Notifications.NotificationPopupManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Cities.CityManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Deposits.DepositManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.CompanyManager>.Initialize();
+            VoxelTycoon.GameCameraView.Initialize();
+            bool newGame = true;
+            Utility.Utils.InvokeMethod(VoxelTycoon.LazyManager<VoxelTycoon.Modding.ModManager>.Current, "OnGameStarting");
+            try
+            {
+                Debug.LogError(Utility.Utils.InvokeMethod(typeof(VoxelTycoon.Serialization.SaveManager), "LoadInternal"));
+                if ((bool)Utility.Utils.InvokeMethod(typeof(VoxelTycoon.Serialization.SaveManager), "LoadInternal"))
+                    newGame = false;
+            }
+            catch (Exception ex)
+            {
+                this.ProgressReporter.ReportException(new Exception((string)VoxelTycoon.S.PreloaderCantLoadSavedGame, ex));
+            }
+            VoxelTycoon.CameraController.Current.View = (VoxelTycoon.ICameraView)VoxelTycoon.GameCameraView.Current;
+            VoxelTycoon.CameraController.Current.DefaultView = (VoxelTycoon.ICameraView)VoxelTycoon.GameCameraView.Current;
+            VoxelTycoon.CameraController.Current.SwitchToDynamicListener();
+            VoxelTycoon.Manager<VoxelTycoon.WorldManager>.Current.OnWorldSettingsInitialized();
+            VoxelTycoon.LazyManager<VoxelTycoon.NamesProvider>.Current.OnWorldSettingsInitialized();
+            VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.OnWorldSettingsInitialized();
+            VoxelTycoon.LazyManager<VoxelTycoon.PlantManager>.Current.OnWorldSettingsInitialized();
+            if (newGame)
+            {
+                VoxelTycoon.Company company = new VoxelTycoon.Company()
+                {
+                    Id = VoxelTycoon.Manager<VoxelTycoon.CompanyManager>.Current.GenerateId(),
+                    Name = (string)VoxelTycoon.LazyManager<VoxelTycoon.Settings>.Current.DefautCompanyName,
+                    Color = (Color)VoxelTycoon.ColorHelper.FromHexString((string)VoxelTycoon.LazyManager<VoxelTycoon.Settings>.Current.DefautCompanyColor)
+                };
+                int loanCount = Mathf.RoundToInt(30f * VoxelTycoon.WorldSettings.Current.StartupCapitalMultiplier);
+                int extraLoanCount = Mathf.RoundToInt(10f * VoxelTycoon.WorldSettings.Current.LoanMultiplier);
+                double loanInterest = 0.01 * (double)VoxelTycoon.WorldSettings.Current.LoanInterestMultiplier;
+                company.InitializeLoan(loanCount, extraLoanCount, 25000.0, loanInterest);
+                VoxelTycoon.Manager<VoxelTycoon.CompanyManager>.Current.Register(company);
+                VoxelTycoon.Manager<VoxelTycoon.CompanyManager>.Current.SetCurrentCompany(company);
+                if (VoxelTycoon.WorldSettings.Current.ResearchDifficulty == VoxelTycoon.Researches.ResearchDifficultyMode.AllCompleted)
+                    VoxelTycoon.LazyManager<VoxelTycoon.Researches.ResearchManager>.Current.CompleteAll();
+                if (VoxelTycoon.WorldSettings.Current.SignalDifficulty == VoxelTycoon.SignalDifficultyMode.All)
+                {
+                    VoxelTycoon.Researches.Research research = VoxelTycoon.Manager<VoxelTycoon.AssetLibrary>.Current.Get<VoxelTycoon.Researches.Research>("base/rail_signals_2.research");
+                    if (research != null && !VoxelTycoon.LazyManager<VoxelTycoon.Researches.ResearchManager>.Current.IsCompleted(research))
+                        VoxelTycoon.LazyManager<VoxelTycoon.Researches.ResearchManager>.Current.Complete(research);
+                }
+                VoxelTycoon.LazyManager<VoxelTycoon.Researches.ResearchManager>.Current.ResearchCompletedFlag = false;
+                this.ProgressReporter.ReportOperationStarted((string)VoxelTycoon.S.Exploring);
+                yield return (object)null;
+                VoxelTycoon.Region regionByIndex = VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.CreateRegionByIndex(new VoxelTycoon.Xz(0, 0), new VoxelTycoon.Xz(1, 1));
+                VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.UnlockRegion(regionByIndex);
+                VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.GenerateChunks();
+                VoxelTycoon.Cities.City city = regionByIndex.Cities.ToList().OrderByDescending<VoxelTycoon.Cities.City, int>((Func<VoxelTycoon.Cities.City, int>)(x => x.Population)).FirstOrDefault<VoxelTycoon.Cities.City>();
+                VoxelTycoon.GameCameraView.Current.SetTarget((Vector3)(VoxelTycoon.Xyz)(city != null ? city.Position : regionByIndex.Center), false);
+            }
+            yield return (object)null;
+            VoxelTycoon.LazyManager<VoxelTycoon.SoundtrackPlayer>.Current.Play(VoxelTycoon.Manager<VoxelTycoon.AssetLibrary>.Current.Get<VoxelTycoon.Audio.Playlist>("base/ost_vol1.playlist"));
+            gameController.SpawnImmediately<VoxelTycoon.AmbientPlayer>(VoxelTycoon.R.Prefabs.AmbientPlayer);
+            VoxelTycoon.LazyManager<VoxelTycoon.TimeManager>.Current.Start();
+            VoxelTycoon.Manager<VoxelTycoon.CompanyManager>.Current.Start();
+            //gameController._lastSaveTime = Time.unscaledTime;
+            //gameController.StartPlaytimeTracking(enabledPacks);
+            VoxelTycoon.UI.UIManager.Current.Interactable = true;
+            //if (newGame)
+                //gameController.StartCoroutine(gameController.StartShowWelcomeMessage());
+           // else if (VoxelTycoon.LazyManager<VoxelTycoon.Game.TutorialManager>.Current.Tutorial != null)
+           //     VoxelTycoon.Game.UI.TutorialWindow.ShowUnique();
+            Debug.Log((object)string.Format("Seed: {0} ({1})", (object)VoxelTycoon.WorldSettings.Current.SeedString, (object)VoxelTycoon.WorldSettings.Current.Seed));
+        }
+
+        private void SetupUI()
+        {
+            VoxelTycoon.UI.UIManager.Initialize();
+            VoxelTycoon.UI.UIManager.Current.Interactable = false;
+            VoxelTycoon.Manager<VoxelTycoon.Game.UI.StorageNetworking.StorageNetworkVisualizationManager>.Initialize();
+            this.SetupIndicatorManager();
+            VoxelTycoon.Game.UI.GameSceneLoadingIndicator frame = VoxelTycoon.UI.UIManager.Current.CreateFrame<VoxelTycoon.Game.UI.GameSceneLoadingIndicator>(VoxelTycoon.UI.FrameAnchoring.Center);
+            frame.Priority = 200;
+            this.ProgressReporter = (VoxelTycoon.SceneControl.ISceneLoadingProgressReporter)frame;
+            frame.Show();
+            VoxelTycoon.UI.UIManager.Current.CreateFrame<VoxelTycoon.Game.GameUI>(VoxelTycoon.UI.FrameAnchoring.Center).Priority = 100;
+            VoxelTycoon.Utils.GraphyFrame.Spawn();
+        }
+
+        private void SetupIndicatorManager()
+        {
+            VoxelTycoon.Manager<VoxelTycoon.UI.IndicatorManager>.Initialize();
+            VoxelTycoon.Manager<VoxelTycoon.Game.UI.IndicatorHelper>.Initialize();
+        }
+
+        [HarmonyPatch(typeof(VoxelTycoon.Game.GameController), "Bootstrap")]
+        class Patch
+        {
+            static bool Prefix(VoxelTycoon.Game.GameController __instance, ref IEnumerator __result)
+            {
+                Debug.Log("Patcher Prefix: Bootstrap");
+
+                GameController._gameController = __instance;
+                __result = new GameController().Bootstrap();
+                return false;
             }
         }
 
         [HarmonyPatch(typeof(VoxelTycoon.Game.GameController), "StartShowWelcomeMessage")]
-        class StartShowWelcomeMessage
+        class Patch2
         {
             static void Prefix(VoxelTycoon.Game.GameController __instance)
             {

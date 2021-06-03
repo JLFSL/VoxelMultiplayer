@@ -11,8 +11,8 @@ namespace VoxelMultiplayer
 		public static Client currentClient;
 		private static Network.Server host;
 
-		private bool firstLoad = false;
-		private bool serverStarted = false;
+		public static bool menuLoaded = false;
+		private static bool serverStarted = false;
 		public bool newGame { get; set; } = false;
 
 		private void Start()
@@ -24,16 +24,7 @@ namespace VoxelMultiplayer
 
 		private void Update()
 		{
-			if (!firstLoad && VoxelTycoon.SceneControl.SceneController.Current.Loaded)
-			{
-				Debug.Log("Client: Showing multiplayer menu");
-
-				VoxelTycoon.UI.UIManager.Current.CreateFrame<VoxelMultiplayer.Game.MultiplayerMenu.UI.MultiplayerMenuFrame>(VoxelTycoon.UI.FrameAnchoring.Fullscreen).Show();
-
-				firstLoad = true;
-			}
-
-			if (firstLoad && !serverStarted && newGame)
+			if (menuLoaded && !serverStarted && newGame)
 			{
 				Debug.LogWarning("Client.Update(): Starting Local Server");
 				host = new Network.Server();
