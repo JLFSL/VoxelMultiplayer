@@ -47,6 +47,11 @@ namespace VoxelMultiplayer.Network
             {
                 data.LoadMap();
             });
+
+            Processor.SubscribeReusable<Packets.BuildingData>((data) =>
+            {
+                data.Build();
+            });
         }
 
         private void Stop()

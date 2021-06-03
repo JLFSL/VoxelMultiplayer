@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 
+using LiteNetLib.Utils;
+
 using UnityEngine;
 
 namespace VoxelMultiplayer.Network.Packets
@@ -34,5 +36,20 @@ namespace VoxelMultiplayer.Network.Packets
         }
     }
 
+    class BuildingData
+    {
+        public int AssetId { get; set; }
+        public int Rotation { get; set; }
 
+        public int PositionX { get; set; }
+        public int PositionY { get; set; }
+        public int PositionZ { get; set; }
+
+        public void Build()
+        {
+            VoxelTycoon.Buildings.Building _temp = UnityEngine.Object.Instantiate<VoxelTycoon.Buildings.Building>(VoxelTycoon.Buildings.BuildingManager.Current.GetRotatedAsset<VoxelTycoon.Buildings.Building>(AssetId, (VoxelTycoon.BuildingRotation)Rotation));
+            //Utility.Utils.InvokeMethod(prevBuilding, "Restore", new VoxelTycoon.Xyz(building.Position.X + 15, building.Position.Y + 15, building.Position.Z + 10), building.Id+1);
+            _temp.Build(new VoxelTycoon.Xyz(PositionX, PositionY, PositionZ));
+        }
+    }
 }
