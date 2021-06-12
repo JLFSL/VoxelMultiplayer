@@ -13,7 +13,7 @@ namespace VoxelMultiplayer.Network
         public static NetManager Manager { get; private set; }
         public static NetPacketProcessor Processor { get; private set; }
 
-        public static NetPeer _clientPeer { get; private set; }
+        public static NetPeer _connectedPeer { get; private set; }
 
         private readonly int Port = 23020;
         private readonly int maxConnected = 1;
@@ -44,7 +44,7 @@ namespace VoxelMultiplayer.Network
             {
                 Debug.LogWarning("We got connection: " + peer.EndPoint); // Show peer ip
 
-                _clientPeer = peer;
+                _connectedPeer = peer;
                 Processor.Send(peer, new Packets.MapData() { Length = CurrentMapData.Length, Data = CurrentMapData }, DeliveryMethod.ReliableOrdered);
             };
         }

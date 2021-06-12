@@ -11,15 +11,21 @@ namespace VoxelMultiplayer
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("2 instances?");
+            string _input = Console.ReadLine();
+
             // Load our assembly and start VoxelTycoon.exe + inject
             Console.WriteLine("Starting server");
             if (Load("VoxelTycoon.exe", "VoxelMultiplayer.dll", "VoxelMultiplayer", "Core", "Load"))
             {
-                Console.WriteLine("Starting client");
-                if(Load("VoxelTycoon2.exe", "VoxelMultiplayer.dll", "VoxelMultiplayer", "Core", "Load"))
+                if (_input == "y")
                 {
-                    // Close our console
-                    Environment.Exit(0);
+                    Console.WriteLine("Starting client");
+                    if (Load("VoxelTycoon2.exe", "VoxelMultiplayer.dll", "VoxelMultiplayer", "Core", "Load"))
+                    {
+                        // Close our console
+                        Environment.Exit(0);
+                    }
                 }
             }
         }
@@ -55,7 +61,7 @@ namespace VoxelMultiplayer
                 }
                 catch (Exception e)
                 {
-                    System.Console.WriteLine("Failed to inject assembly (system error): " + e);
+                    Console.WriteLine("Failed to inject assembly (system error): " + e);
                     Console.ReadLine();
 
                     return false;

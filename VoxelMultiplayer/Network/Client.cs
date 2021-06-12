@@ -12,8 +12,10 @@ namespace VoxelMultiplayer.Network
     public class Client : MonoBehaviour
     {
         private static EventBasedNetListener Listener;
-        private static NetManager Manager;
+        public static NetManager Manager;
         private static NetPacketProcessor Processor;
+
+        public static NetPeer _clientPeer { get; private set; }
 
         private readonly string Host = "localhost";
         private readonly int Port = 23020;
@@ -38,7 +40,8 @@ namespace VoxelMultiplayer.Network
             Manager.Connect(Host, Port, Key);
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                Processor.ReadAllPackets(dataReader, fromPeer);
+                if (fromPeer != Manager.GetEnumerator().Current)
+                    Processor.ReadAllPackets(dataReader, fromPeer);
 
                 dataReader.Recycle();
             };

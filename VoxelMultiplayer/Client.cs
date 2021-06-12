@@ -1,85 +1,63 @@
 ﻿using System.IO;
-using System.Reflection;
-using System.Threading;
 
 using UnityEngine;
 
+using VoxelTycoon.Game.UI;
+using VoxelTycoon.Serialization;
+
 namespace VoxelMultiplayer
 {
-	public class Client : MonoBehaviour
-	{
-		public static Client currentClient;
+    public class Client : MonoBehaviour
+    {
+        public static Client currentClient;
 
-		private static GameObject host;
-		public static GameObject client;
+        public static GameObject host;
+        public static GameObject client;
 
-		public static bool menuLoaded = false;
-		private static bool serverStarted = false;
-		public bool newGame { get; set; } = false;
-		public static bool GameReady = false;
+        public static bool menuLoaded = false;
+        public static bool serverStarted = false;
 
-		private void Start()
-		{
-			Debug.Log("Client.Start(): Loaded");
+        private void Start()
+        {
+            Debug.Log("Client.Start(): Loaded");
+        }
 
-			currentClient = this;
-		}
+        private void Update()
+        {
+            if (Input.GetKeyUp(KeyCode.F3)) // Load def. map
+            {
+                Debug.Log("Client.Update(): F3 pressed");
 
-		private void Update()
-		{
-			if (menuLoaded && !serverStarted && newGame)
-			{
-				Debug.Log("Update(): Adding GameObject: Host");
-				host = new GameObject();
-				host.AddComponent<Network.Server>();
-				UnityEngine.Object.DontDestroyOnLoad(host);
+                FileInfo file = new FileInfo("C:\\Users\\Jimmy\\AppData\\LocalLow\\VoxelTycoon\\VoxelTycoon\\Saves\\xtfhf1d6x7r.sav");
 
-				serverStarted = true;
-				newGame = false;
+                SaveMetadata save = SaveSerializer.ReadMetadata<SaveMetadata>(file.Name);
+                save.Size = file.Length;
 
-				// Send map data to server
-				Network.Server.ReceiveLatestMap(File.ReadAllBytes(VoxelTycoon.Serialization.SaveManager.SavesDirectory + "/" + VoxelTycoon.Serialization.SaveManager.Autosave().Filename));
+                Debug.Log("Client.Update(): Attempting to load savegame: " + file.FullName);
+                Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(save));
+                Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(SaveManager.GetFullMetadata(save)));
+                LoadGameHelper.TryLoad(SaveManager.GetFullMetadata(save));
+            }
 
-				GameReady = true;
+            if (Input.GetKeyUp(KeyCode.F5)) // Connect to server (and load game? :-))
+            {
+                Debug.Log("Client.Update(): F5 pressed");
 
-				// Quits the analytics manager so we don't get spammed
-				Utility.Utils.InvokeMethod(VoxelTycoon.SceneControl.SceneController.Current, "OnApplicationQuit");
-			}
+                Debug.Log("Update(): Adding GameObject: Client");
+                client = new GameObject();
+                client.AddComponent<Network.Client>();
+                DontDestroyOnLoad(client);
+            }
 
-			if (Input.GetKeyUp(KeyCode.F3)) // Load def. map
-			{
-				Debug.Log("Client.Update(): F3 pressed");
+            if (Input.GetKeyUp(KeyCode.F6))
+            {
 
-				FileInfo file = new FileInfo("C:\\Users\\Jimmy\\AppData\\LocalLow\\VoxelTycoon\\VoxelTycoon\\Saves\\xtfhf1d6x7r.sav");
+            }
 
-				VoxelTycoon.Serialization.SaveMetadata save = VoxelTycoon.Serialization.SaveSerializer.ReadMetadata<VoxelTycoon.Serialization.SaveMetadata>(file.Name);
-				save.Size = file.Length;
+            if (Input.GetKeyUp(KeyCode.F7))
+            {
 
-				Debug.Log("Client.Update(): Attempting to load savegame: " + file.FullName);
-				Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(save));
-				Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(VoxelTycoon.Serialization.SaveManager.GetFullMetadata(save)));
-				VoxelTycoon.Game.UI.LoadGameHelper.TryLoad(VoxelTycoon.Serialization.SaveManager.GetFullMetadata(save));
-			}
-
-			if (Input.GetKeyUp(KeyCode.F5)) // Connect to server (and load game? :-))
-			{
-				Debug.Log("Client.Update(): F5 pressed");
-
-				Debug.Log("Update(): Adding GameObject: Client");
-				client = new GameObject();
-				client.AddComponent<Network.Client>();
-				UnityEngine.Object.DontDestroyOnLoad(client);
-			}
-
-			if (Input.GetKeyUp(KeyCode.F6))
-			{
-				
-			}
-
-			if (Input.GetKeyUp(KeyCode.F7))
-			{
-				
-			}
-		}
-	}
+            }
+        }
+    }
 }

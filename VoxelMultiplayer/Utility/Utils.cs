@@ -26,22 +26,12 @@ namespace VoxelMultiplayer.Utility
 
         public static object GetValueForField(object classObj, string fieldName, BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
         {
-            Debug.LogError(classObj + " " + fieldName + " " + bindingFlags);
-            
-            FieldInfo test = classObj.GetType().GetField(fieldName, bindingFlags);
-            Debug.LogError(test);
-
-            return classObj.GetType().GetField(fieldName, bindingFlags).GetValue(classObj);
+            return classObj.GetType().GetField(fieldName, bindingFlags)?.GetValue(classObj);
         }
 
         public static void SetValueForField(object classObj, string fieldName, object value, BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
         {
-            Debug.LogError(classObj + " " + fieldName + " " + bindingFlags);
-
-            FieldInfo test = classObj.GetType().GetField(fieldName, bindingFlags);
-            Debug.LogError(test);
-
-            classObj.GetType().GetField(fieldName, bindingFlags).SetValue(classObj, value);
+            classObj.GetType().GetField(fieldName, bindingFlags)?.SetValue(classObj, value);
         }
 
         public static bool ByteArrayToFile(string fileName, byte[] byteArray)

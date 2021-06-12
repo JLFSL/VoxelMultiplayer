@@ -61,7 +61,7 @@ namespace VoxelMultiplayer.Utils
         /// <summary>
         /// Font size to display log entries with.
         /// </summary>
-        public int logFontSize = 18;
+        public int logFontSize = 14;
 
         /// <summary>
         /// Amount to scale UI by.
@@ -125,8 +125,8 @@ namespace VoxelMultiplayer.Utils
 
             GUI.matrix = Matrix4x4.Scale(Vector3.one * scaleFactor);
 
-            float width = (Screen.width / scaleFactor) - (margin * 32);
-            float height = (Screen.height / scaleFactor) - (margin * 32);
+            float width = (Screen.width / scaleFactor) - (margin * 24);
+            float height = (Screen.height / scaleFactor) - (margin * 24);
             Rect windowRect = new Rect(windowX, windowY, width, height);
 
             Rect newWindowRect = GUILayout.Window(123456, windowRect, DrawWindow, windowTitle);
@@ -255,7 +255,7 @@ namespace VoxelMultiplayer.Utils
                 return null;
             }
 
-            logs.TakeLast<Log>(10);
+            logs.TakeLast(10);
             return logs.Last();
         }
 

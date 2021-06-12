@@ -7,16 +7,16 @@ namespace LiteNetLib.Utils
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Most applications should just use the <see cref="NtpPacket.CorrectionOffset" /> property.
+    /// Most applications should just use the <see cref="CorrectionOffset" /> property.
     /// </para>
     /// <para>
     /// The same data structure represents both request and reply packets.
     /// Request and reply differ in which properties are set and to what values.
     /// </para>
     /// <para>
-    /// The only real property is <see cref="NtpPacket.Bytes" />.
+    /// The only real property is <see cref="Bytes" />.
     /// All other properties read from and write to the underlying byte array
-    /// with the exception of <see cref="NtpPacket.DestinationTimestamp" />,
+    /// with the exception of <see cref="DestinationTimestamp" />,
     /// which is not part of the packet on network and it is instead set locally after receiving the packet.
     /// </para>
     /// <para>
@@ -36,7 +36,7 @@ namespace LiteNetLib.Utils
         /// </value>
         /// <remarks>
         /// This is the only real property. All other properties except
-        /// <see cref="NtpPacket.DestinationTimestamp" /> read from or write to this byte array.
+        /// <see cref="DestinationTimestamp" /> read from or write to this byte array.
         /// </remarks>
         public byte[] Bytes { get; private set; }
 
@@ -96,7 +96,7 @@ namespace LiteNetLib.Utils
         /// </para>
         /// <para>
         /// Special value 0 indicates that this packet is a Kiss-o'-Death message
-        /// with kiss code stored in <see cref="NtpPacket.ReferenceId" />.
+        /// with kiss code stored in <see cref="ReferenceId" />.
         /// </para>
         /// </value>
         public int Stratum { get { return Bytes[1]; } }
@@ -139,7 +139,7 @@ namespace LiteNetLib.Utils
         /// <value>
         /// <para>
         /// ID of server's time source or Kiss-o'-Death code.
-        /// Purpose of this property depends on value of <see cref="NtpPacket.Stratum" /> property.
+        /// Purpose of this property depends on value of <see cref="Stratum" /> property.
         /// </para>
         /// <para>
         /// Stratum 1 servers write here one of several special values that describe the kind of hardware clock they use.
@@ -149,7 +149,7 @@ namespace LiteNetLib.Utils
         /// If upstream server has IPv6 address, the address is hashed, because it doesn't fit in this property.
         /// </para>
         /// <para>
-        /// When server sets <see cref="NtpPacket.Stratum" /> to special value 0,
+        /// When server sets <see cref="Stratum" /> to special value 0,
         /// this property contains so called kiss code that instructs the client to stop querying the server.
         /// </para>
         /// </value>
@@ -173,11 +173,11 @@ namespace LiteNetLib.Utils
         /// <value>
         /// This property is <c>null</c> in request packets.
         /// In reply packets, it is the time when the client sent its request.
-        /// Servers copy this value from <see cref="NtpPacket.TransmitTimestamp" />
+        /// Servers copy this value from <see cref="TransmitTimestamp" />
         /// that they find in received request packet.
         /// </value>
-        /// <seealso cref="NtpPacket.CorrectionOffset" />
-        /// <seealso cref="NtpPacket.RoundTripTime" />
+        /// <seealso cref="CorrectionOffset" />
+        /// <seealso cref="RoundTripTime" />
         public DateTime? OriginTimestamp { get { return GetDateTime64(24); } }
 
         /// <summary>
@@ -187,8 +187,8 @@ namespace LiteNetLib.Utils
         /// This property is <c>null</c> in request packets.
         /// In reply packets, it is the time when the server received client request.
         /// </value>
-        /// <seealso cref="NtpPacket.CorrectionOffset" />
-        /// <seealso cref="NtpPacket.RoundTripTime" />
+        /// <seealso cref="CorrectionOffset" />
+        /// <seealso cref="RoundTripTime" />
         public DateTime? ReceiveTimestamp { get { return GetDateTime64(32); } }
 
         /// <summary>
@@ -196,13 +196,13 @@ namespace LiteNetLib.Utils
         /// </summary>
         /// <value>
         /// Time when the packet was sent. It should never be <c>null</c>.
-        /// Default value is <see cref="System.DateTime.UtcNow" />.
+        /// Default value is <see cref="DateTime.UtcNow" />.
         /// </value>
         /// <remarks>
         /// This property must be set by both clients and servers.
         /// </remarks>
-        /// <seealso cref="NtpPacket.CorrectionOffset" />
-        /// <seealso cref="NtpPacket.RoundTripTime" />
+        /// <seealso cref="CorrectionOffset" />
+        /// <seealso cref="RoundTripTime" />
         public DateTime? TransmitTimestamp { get { return GetDateTime64(40); } private set { SetDateTime64(40, value); } }
 
         /// <summary>
@@ -214,8 +214,8 @@ namespace LiteNetLib.Utils
         /// <remarks>
         /// This property is not part of the protocol and has to be set when reply packet is received.
         /// </remarks>
-        /// <seealso cref="NtpPacket.CorrectionOffset" />
-        /// <seealso cref="NtpPacket.RoundTripTime" />
+        /// <seealso cref="CorrectionOffset" />
+        /// <seealso cref="RoundTripTime" />
         public DateTime? DestinationTimestamp { get; private set; }
 
         /// <summary>
@@ -224,10 +224,10 @@ namespace LiteNetLib.Utils
         /// <value>
         /// Time the request spent traveling to the server plus the time the reply spent traveling back.
         /// This is calculated from timestamps in the packet as <c>(t1 - t0) + (t3 - t2)</c>
-        /// where t0 is <see cref="NtpPacket.OriginTimestamp" />,
-        /// t1 is <see cref="NtpPacket.ReceiveTimestamp" />,
-        /// t2 is <see cref="NtpPacket.TransmitTimestamp" />,
-        /// and t3 is <see cref="NtpPacket.DestinationTimestamp" />.
+        /// where t0 is <see cref="OriginTimestamp" />,
+        /// t1 is <see cref="ReceiveTimestamp" />,
+        /// t2 is <see cref="TransmitTimestamp" />,
+        /// and t3 is <see cref="DestinationTimestamp" />.
         /// This property throws an exception in request packets.
         /// </value>
         public TimeSpan RoundTripTime
@@ -245,10 +245,10 @@ namespace LiteNetLib.Utils
         /// <value>
         /// Time difference between server and client. It should be added to local time to get server time.
         /// It is calculated from timestamps in the packet as <c>0.5 * ((t1 - t0) - (t3 - t2))</c>
-        /// where t0 is <see cref="NtpPacket.OriginTimestamp" />,
-        /// t1 is <see cref="NtpPacket.ReceiveTimestamp" />,
-        /// t2 is <see cref="NtpPacket.TransmitTimestamp" />,
-        /// and t3 is <see cref="NtpPacket.DestinationTimestamp" />.
+        /// where t0 is <see cref="OriginTimestamp" />,
+        /// t1 is <see cref="ReceiveTimestamp" />,
+        /// t2 is <see cref="TransmitTimestamp" />,
+        /// and t3 is <see cref="DestinationTimestamp" />.
         /// This property throws an exception in request packets.
         /// </value>
         public TimeSpan CorrectionOffset
@@ -264,9 +264,9 @@ namespace LiteNetLib.Utils
         /// Initializes default request packet.
         /// </summary>
         /// <remarks>
-        /// Properties <see cref="NtpPacket.Mode" /> and <see cref="NtpPacket.VersionNumber" />
-        /// are set appropriately for request packet. Property <see cref="NtpPacket.TransmitTimestamp" />
-        /// is set to <see cref="System.DateTime.UtcNow" />.
+        /// Properties <see cref="Mode" /> and <see cref="VersionNumber" />
+        /// are set appropriately for request packet. Property <see cref="TransmitTimestamp" />
+        /// is set to <see cref="DateTime.UtcNow" />.
         /// </remarks>
         public NtpPacket() : this(new byte[48])
         {
