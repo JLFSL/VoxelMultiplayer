@@ -33,6 +33,11 @@ namespace VoxelMultiplayer.Utility
             return classObj.GetType().GetField(fieldName, bindingFlags)?.GetValue(classObj);
         }
 
+        public static T GetField<T>(object classObj, string fieldName, BindingFlags bindingFlags = AllBindingFlags)
+        {
+            return (T)GetField(classObj, fieldName, bindingFlags);
+        }
+
         public static void SetField(object classObj, string fieldName, object value, BindingFlags bindingFlags = AllBindingFlags)
         {
             Debug.LogError("SetField: " + classObj.ToString() + "." + fieldName);
@@ -47,7 +52,7 @@ namespace VoxelMultiplayer.Utility
 
         public static T GetProperty<T>(object classObj, string fieldName, BindingFlags bindingFlags = AllBindingFlags)
         {
-            return (T)GetProperty(classObj, fieldName);
+            return (T)GetProperty(classObj, fieldName, bindingFlags);
         }
 
         public static object GetProperty2(object classObj, string fieldName, Type returnType)
@@ -65,38 +70,14 @@ namespace VoxelMultiplayer.Utility
         {
             try
             {
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                {
-                    fs.Write(byteArray, 0, byteArray.Length);
-                    return true;
-                }
+                using var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+                fs.Write(byteArray, 0, byteArray.Length);
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.LogError("Exception caught in process: " + ex);
                 return false;
-            }
-        }
-
-        public static byte[] ObjectToByteArray(object obj)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
-
-        public static object ByteArrayToObject(byte[] arrBytes)
-        {
-            using (var memStream = new MemoryStream())
-            {
-                var binForm = new BinaryFormatter();
-                memStream.Write(arrBytes, 0, arrBytes.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                var obj = binForm.Deserialize(memStream);
-                return obj;
             }
         }
     }

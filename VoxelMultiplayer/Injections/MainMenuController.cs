@@ -12,7 +12,7 @@ namespace VoxelMultiplayer.Injections
     {
         [HarmonyPatch(typeof(MainMenuController))]
         [HarmonyPatch("SetupUI")]
-        static bool Prefix(MainMenuController __instance)
+        static bool Prefix()
         {
             Debug.Log("_MainMenuController: Showing multiplayer menu");
             UIManager.Current.CreateFrame<MPUI.MainMenu>(FrameAnchoring.Fullscreen).Show();

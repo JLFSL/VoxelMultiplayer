@@ -15,7 +15,7 @@ namespace VoxelMultiplayer.Injections
     {
         [HarmonyPatch(typeof(Building))]
         [HarmonyPatch("Build")]
-        static void Postfix(Building __instance, Xyz position, BuildStrategy buildStrategy = null)
+        static void Postfix(Building __instance)
         {
             if(_GameController.Playable)
             {
