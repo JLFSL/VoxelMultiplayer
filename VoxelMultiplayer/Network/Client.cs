@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading;
+﻿using System.IO;
 
 using UnityEngine;
 
@@ -20,8 +18,6 @@ namespace VoxelMultiplayer.Network
         private readonly string Host = "localhost";
         private readonly int Port = 23020;
         private readonly string Key = "";
-
-        //private readonly int maxStringLength = 65535;
 
         public bool closeConnection = false;
 
@@ -54,6 +50,11 @@ namespace VoxelMultiplayer.Network
             Processor.SubscribeReusable<Packets.BuildingData>((data) =>
             {
                 data.Build();
+            });
+
+            Processor.SubscribeReusable<Packets.ToolExecuteData>((data) =>
+            {
+                data.Execute();
             });
         }
 

@@ -35,11 +35,13 @@ namespace VoxelMultiplayer.Injections
     class _GameController : GameController
     {
         public static _GameController Instance { get; private set; }
+        public static bool Playable = false;
+
         public bool NewGame = true;
 
         public override IEnumerator Bootstrap()
         {
-            Utility.Utils.SetValueForField(typeof(SceneController), "Current", this);
+            Utility.Utils.SetField(typeof(SceneController), "Current", this);
             Instance = this;
 
             SteamManager.CreateSafe();
@@ -73,7 +75,7 @@ namespace VoxelMultiplayer.Injections
 				base.ProgressReporter.ReportException(exception);
 			}*/
 
-            yield return Utility.Utils.InvokeMethod(Manager<AssetLibrary>.Current, "Load", ProgressReporter, enabledPacks);
+            yield return Utility.Utils.Invoke(Manager<AssetLibrary>.Current, "Load", ProgressReporter, enabledPacks);
             try
             {
                 LazyManager<VehicleUnitManager>.Current.OnAssetsLoaded();
@@ -86,7 +88,7 @@ namespace VoxelMultiplayer.Injections
                 ProgressReporter.ReportException(new Exception("Can't finalize asset loading", innerException));
             }
 
-            Utility.Utils.InvokeMethod(GameUI.Current, "OnLocalizationReady", null);
+            Utility.Utils.Invoke(GameUI.Current, "OnLocalizationReady", null);
             if (SaveManager.LoadingMetadata != null)
             {
                 ProgressReporter.ReportOperationStarted(S.PreloaderLoadingSavedGame);
@@ -107,7 +109,7 @@ namespace VoxelMultiplayer.Injections
             Manager<CompanyManager>.Initialize();
             GameCameraView.Initialize();
 
-            //Utility.Utils.InvokeMethod(LazyManager<ModManager>.Current, "OnGameStarting");
+            //Utility.Utils.Invoke(LazyManager<ModManager>.Current, "OnGameStarting");
             try
             {
                 if (SaveManager.LoadingMetadata != null)
@@ -201,9 +203,6 @@ namespace VoxelMultiplayer.Injections
                 ExtendedSaveMetadata _save = SaveManager.Autosave();
                 Network.Server.ReceiveLatestMap(File.ReadAllBytes(SaveManager.SavesDirectory + "/" + _save.Filename));
                 File.Delete(SaveManager.SavesDirectory + "/" + _save.Filename);
-
-                // Quits the analytics manager so we don't get spammed (doesn't work currently, need another way)
-                //Utility.Utils.InvokeMethod(VoxelTycoon.SceneControl.SceneController.Current, "OnApplicationQuit");
             }
             else if (LazyManager<TutorialManager>.Current.Tutorial != null)
             {
@@ -213,6 +212,7 @@ namespace VoxelMultiplayer.Injections
                     File.Delete(Network.Packets.MapData.TemporarySave.FullName);
             }
 
+            Playable = true;
             Debug.Log($"Seed: {WorldSettings.Current.SeedString} ({WorldSettings.Current.Seed})");
 
             OnLoaded();
@@ -257,7 +257,7 @@ namespace VoxelMultiplayer.Injections
 
         [HarmonyPatch(typeof(GameController))]
         [HarmonyPatch("Bootstrap")]
-        static bool Prefix(GameController __instance, ref IEnumerator __result)
+        static bool Prefix(ref IEnumerator __result)
         {
             Debug.Log("_GameController: Bootstrap Patch");
 

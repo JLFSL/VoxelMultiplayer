@@ -17,6 +17,7 @@ namespace VoxelMultiplayer.Injections
             Debug.Log("_MainMenuController: Showing multiplayer menu");
             UIManager.Current.CreateFrame<MPUI.MainMenu>(FrameAnchoring.Fullscreen).Show();
             Client.menuLoaded = true;
+            _GameController.Playable = false;
             return false;
         }
     }

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net471</TargetFramework>
+	<LangVersion>8.0</LangVersion>
     <Platforms>x64</Platforms>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
