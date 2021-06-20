@@ -7,13 +7,11 @@ using LiteNetLib.Utils;
 
 namespace VoxelMultiplayer.Network
 {
-    public class Client : MonoBehaviour
+    public class ClientPeer : MonoBehaviour
     {
         private static EventBasedNetListener Listener;
         public static NetManager Manager;
-        private static NetPacketProcessor Processor;
-
-        public static NetPeer _clientPeer { get; private set; }
+        public static NetPacketProcessor Processor;
 
         private readonly string Host = "localhost";
         private readonly int Port = 23020;
@@ -36,8 +34,7 @@ namespace VoxelMultiplayer.Network
             Manager.Connect(Host, Port, Key);
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                if (fromPeer != Manager.GetEnumerator().Current)
-                    Processor.ReadAllPackets(dataReader, fromPeer);
+                Processor.ReadAllPackets(dataReader, fromPeer);
 
                 dataReader.Recycle();
             };
@@ -50,11 +47,6 @@ namespace VoxelMultiplayer.Network
             Processor.SubscribeReusable<Packets.BuildingData>((data) =>
             {
                 data.Build();
-            });
-
-            Processor.SubscribeReusable<Packets.ToolExecuteData>((data) =>
-            {
-                data.Execute();
             });
         }
 

@@ -5,7 +5,6 @@ using UnityEngine;
 using VoxelMultiplayer.Network;
 using VoxelMultiplayer.Network.Packets;
 
-using VoxelTycoon;
 using VoxelTycoon.Buildings;
 
 namespace VoxelMultiplayer.Injections
@@ -17,16 +16,31 @@ namespace VoxelMultiplayer.Injections
         [HarmonyPatch("Build")]
         static void Postfix(Building __instance)
         {
-            if(_GameController.Playable)
+            BuildingData data = new BuildingData()
             {
-                Server.Manager.SendToAll(Server.Processor.Write(new BuildingData()
+                AssetId = __instance.AssetId,
+                Rotation = (int)__instance.Rotation,
+                PositionX = __instance.Position.X,
+                PositionY = __instance.Position.Y,
+                PositionZ = __instance.Position.Z,
+                DisplayName = __instance.DisplayName
+            };
+
+            if (__instance.Parent != null)
+                data.ParentId = __instance.Parent.Id;
+
+            if (_GameController.Playable)
+            {
+                if (Client.ClientPeer)
                 {
-                    AssetId = __instance.AssetId,
-                    Rotation = (int)__instance.Rotation,
-                    PositionX = __instance.Position.X,
-                    PositionY = __instance.Position.Y,
-                    PositionZ = __instance.Position.Z
-                }), DeliveryMethod.ReliableOrdered);
+                    Debug.LogError("Packet " + data.GetType() + " from Client");
+                    ClientPeer.Manager.SendToAll(ClientPeer.Processor.Write(data), DeliveryMethod.ReliableOrdered, ClientPeer.Manager.GetEnumerator().Current);
+                }
+                else if (Client.ServerPeer)
+                {
+                    Debug.LogError("Packet " + data.GetType() + " from Server");
+                    ServerPeer.Manager.SendToAll(ServerPeer.Processor.Write(data), DeliveryMethod.ReliableOrdered, ServerPeer.Manager.GetEnumerator().Current);
+                }
             }
         }
     }

@@ -4,33 +4,10 @@ using System.Linq;
 
 using UnityEngine;
 
-public static class Extensions
-{
-    public static IEnumerable<T> TakeLast<T>(this IEnumerable<T> collection,
-        int n)
-    {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
-        if (n < 0)
-            throw new ArgumentOutOfRangeException(nameof(n), $"{nameof(n)} must be 0 or greater");
-
-        LinkedList<T> temp = new LinkedList<T>();
-
-        foreach (var value in collection)
-        {
-            temp.AddLast(value);
-            if (temp.Count > n)
-                temp.RemoveFirst();
-        }
-
-        return temp;
-    }
-}
-
 // Author: Github @mminer
 // Source: https://github.com/mminer/consolation
 
-namespace VoxelMultiplayer.Utils
+namespace VoxelMultiplayer.Utility
 {
     public class Console : MonoBehaviour
     {
@@ -255,7 +232,7 @@ namespace VoxelMultiplayer.Utils
                 return null;
             }
 
-            logs.TakeLast(10);
+            logs.Last();
             return logs.Last();
         }
 

@@ -11,8 +11,8 @@ namespace VoxelMultiplayer
     {
         public static Client currentClient;
 
-        public static GameObject host;
-        public static GameObject client;
+        public static GameObject ServerPeer;
+        public static GameObject ClientPeer;
 
         public static bool menuLoaded = false;
         public static bool serverStarted = false;
@@ -34,8 +34,6 @@ namespace VoxelMultiplayer
                 save.Size = file.Length;
 
                 Debug.Log("Client.Update(): Attempting to load savegame: " + file.FullName);
-                Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(save));
-                Debug.Log(Newtonsoft.Json.JsonConvert.SerializeObject(SaveManager.GetFullMetadata(save)));
                 LoadGameHelper.TryLoad(SaveManager.GetFullMetadata(save));
             }
 
@@ -44,9 +42,9 @@ namespace VoxelMultiplayer
                 Debug.Log("Client.Update(): F5 pressed");
 
                 Debug.Log("Update(): Adding GameObject: Client");
-                client = new GameObject();
-                client.AddComponent<Network.Client>();
-                DontDestroyOnLoad(client);
+                ClientPeer = new GameObject();
+                ClientPeer.AddComponent<Network.ClientPeer>();
+                DontDestroyOnLoad(ClientPeer);
             }
 
             if (Input.GetKeyUp(KeyCode.F6))

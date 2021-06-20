@@ -131,9 +131,9 @@ namespace VoxelMultiplayer.MPUI
             SceneManager.LoadScene("GameScene");
 
             Debug.Log("Update(): Adding GameObject: Client");
-            Client.client = new GameObject();
-            Client.client.AddComponent<Network.Client>();
-            DontDestroyOnLoad(Client.client);
+            Client.ClientPeer = new GameObject();
+            Client.ClientPeer.AddComponent<Network.ClientPeer>();
+            DontDestroyOnLoad(Client.ClientPeer);
         }
 
         private void Quit() => Helper.Quit();

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 
+using LiteNetLib;
 using UnityEngine;
+
+using VoxelMultiplayer.Injections;
 
 using VoxelTycoon;
 using VoxelTycoon.Buildings;
@@ -11,6 +14,28 @@ using VoxelTycoon.Tools;
 
 namespace VoxelMultiplayer.Network.Packets
 {
+    class Helper
+    {
+        public static void SendPacketToOthers(object data, DeliveryMethod options)
+        {
+            if (_GameController.Playable)
+            {
+                if (Client.ClientPeer)
+                {
+                    Debug.LogError("Packet " + data.GetType() + " from Client");
+
+                    ClientPeer.Manager.SendToAll(ClientPeer.Processor.Write(data), options, ClientPeer.Manager.GetEnumerator().Current);
+                }
+                else if (Client.ServerPeer)
+                {
+                    Debug.LogError("Packet " + data.GetType() + " from Server");
+
+                    ServerPeer.Manager.SendToAll(ServerPeer.Processor.Write(data), options, ServerPeer.Manager.GetEnumerator().Current);
+                }
+            }
+        }
+    }
+
     class MapData
     {
         public static FileInfo TemporarySave;
@@ -40,6 +65,11 @@ namespace VoxelMultiplayer.Network.Packets
 
     class BuildingData
     {
+        public static Building[] Buildings = new Building[100000];
+
+        //public int GameId { get; set; }
+        public int ParentId { get; set; } = -1;
+
         public int AssetId { get; set; }
         public int Rotation { get; set; }
 
@@ -47,55 +77,29 @@ namespace VoxelMultiplayer.Network.Packets
         public int PositionY { get; set; }
         public int PositionZ { get; set; }
 
+        public string DisplayName { get; set; }
+
         public void Build()
         {
-            Building _temp = UnityEngine.Object.Instantiate(BuildingManager.Current.GetRotatedAsset<Building>(AssetId, (BuildingRotation)Rotation));
+            int Id = Buildings.Length - Buildings.Length + 1;
+
+            Buildings[Id] = UnityEngine.Object.Instantiate(BuildingManager.Current.GetRotatedAsset<Building>(AssetId, (BuildingRotation)Rotation));
+
             //Utility.Utils.Invoke(prevBuilding, "Restore", new VoxelTycoon.Xyz(building.Position.X + 15, building.Position.Y + 15, building.Position.Z + 10), building.Id+1);
             //_temp.Build(new VoxelTycoon.Xyz(PositionX, PositionY, PositionZ));
 
-            _temp.Company = Company.Current;
-            _temp.City = VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.GetClosestCity(new VoxelTycoon.Xz(PositionX, PositionZ));
+            Buildings[Id].Company = Company.Current;
+            Buildings[Id].City = VoxelTycoon.Manager<VoxelTycoon.RegionManager>.Current.GetClosestCity(new VoxelTycoon.Xz(PositionX, PositionZ));
+            if(ParentId != -1)
+                Buildings[Id].Parent = Buildings[ParentId];
 
-            _temp.Build(new Xyz(PositionX, PositionY, PositionZ));
-            
-            //Utility.Utils.Invoke(_temp, "Restore", new Xyz(PositionX, PositionY, PositionZ), LazyManager<BuildingManager>.Current.GenerateId());
+            Utility.Utils.SetField(Buildings[Id], "DisplayName", DisplayName);
+
+            Buildings[Id].Build(new Xyz(PositionX, PositionY, PositionZ));
+
+            //GameId = LazyManager<BuildingManager>.Current.GenerateId();
+
+            //Utility.Utils.Invoke(Buildings[Id], "Restore", new Xyz(PositionX, PositionY, PositionZ), GameId);
         }
-    }
-
-    class ToolExecuteData
-    {
-        public bool Predicate { get; set; }
-        public double Price { get; set; }
-        public int BudgetItem { get; set; }
-
-        public float PositionX { get; set; }
-        public float PositionY { get; set; }
-        public float PositionZ { get; set; }
-
-        public void Execute()
-        {
-            if (Predicate && Company.Current.HasEnoughMoney(Price))
-            {
-                Company.Current.AddMoney(0.0 - Price, (BudgetItem)BudgetItem);
-                LazyManager<ToolHintManager>.Current.Hide();
-                if (Price != 0.0)
-                {
-                    LazyManager<ToolHintManager>.Current.Float(new Vector3(PositionX, PositionY, PositionZ), Price);
-                }
-                /*if (successSound != null)
-                {
-                    Manager<SoundManager>.Current.PlayOnce(successSound);
-                }*/
-            }
-            /*if (failureSound != null)
-            {
-                Manager<SoundManager>.Current.PlayOnce(failureSound);
-            }*/
-        }
-    }
-
-    class BuilderToolData
-    {
-        //BuildingRecipe
     }
 }

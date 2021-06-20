@@ -188,27 +188,27 @@ namespace VoxelMultiplayer.Injections
                 Manager<SoundManager>.Current.PlayOnce(new Sound { Clip = R.Audio.Raw.Notification }, new Vector3?());
                 RegionDetailsWindow.ShowWelcome(Manager<RegionManager>.Current.HomeRegion);
 
-                if(Network.Server.Manager != null)
-                    Network.Server.Manager.Stop();
+                if(Network.ServerPeer.Manager != null)
+                    Network.ServerPeer.Manager.Stop();
 
                 ProgressReporter.ReportOperationStarted("Starting Server");
                 Debug.Log("Client.Update(): Adding GameObject: Host");
-                Client.host = new GameObject();
-                Client.host.AddComponent<Network.Server>();
-                DontDestroyOnLoad(Client.host);
+                Client.ServerPeer = new GameObject();
+                Client.ServerPeer.AddComponent<Network.ServerPeer>();
+                DontDestroyOnLoad(Client.ServerPeer);
 
                 Client.serverStarted = true;
 
                 // Send map data to server
                 ExtendedSaveMetadata _save = SaveManager.Autosave();
-                Network.Server.ReceiveLatestMap(File.ReadAllBytes(SaveManager.SavesDirectory + "/" + _save.Filename));
+                Network.ServerPeer.ReceiveLatestMap(File.ReadAllBytes(SaveManager.SavesDirectory + "/" + _save.Filename));
                 File.Delete(SaveManager.SavesDirectory + "/" + _save.Filename);
             }
             else if (LazyManager<TutorialManager>.Current.Tutorial != null)
             {
                 TutorialWindow.ShowUnique();
 
-                if (Network.Client.Manager != null)
+                if (Network.ClientPeer.Manager != null)
                     File.Delete(Network.Packets.MapData.TemporarySave.FullName);
             }
 

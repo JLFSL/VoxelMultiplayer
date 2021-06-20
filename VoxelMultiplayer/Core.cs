@@ -19,7 +19,7 @@ namespace VoxelMultiplayer
 
             Debug.Log("Load(): Adding GameObject: Logger");
             Logger = new GameObject();
-            Logger.AddComponent<Utils.Console>();
+            Logger.AddComponent<Utility.Console>();
             Object.DontDestroyOnLoad(Logger);
 
             Debug.Log("Load(): Initializing Patcher");
