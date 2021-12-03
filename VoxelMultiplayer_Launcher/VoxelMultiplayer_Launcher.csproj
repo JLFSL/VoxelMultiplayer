@@ -9,8 +9,4 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutputPath>C:\Users\Jimmy\Source\Repos\VoxelMultiplayer\bin\</OutputPath>
-  </PropertyGroup>
-
 </Project>
