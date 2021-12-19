@@ -9,15 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Game\Modding\**" />
-    <Compile Remove="Source\**" />
-    <EmbeddedResource Remove="Game\Modding\**" />
-    <EmbeddedResource Remove="Source\**" />
-    <None Remove="Game\Modding\**" />
-    <None Remove="Source\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>Vendor\0Harmony.dll</HintPath>
     </Reference>

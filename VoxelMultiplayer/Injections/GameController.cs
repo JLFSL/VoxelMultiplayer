@@ -101,6 +101,7 @@ namespace VoxelMultiplayer.Injections
             Manager<WindManager>.Initialize();
             Manager<WorldManager>.Initialize();
             Manager<CargoManager>.Initialize();
+            Manager<VehicleMaintenanceManager>.Initialize();
             Manager<NotificationManager>.Initialize();
             Manager<NotificationPopupManager>.Initialize();
             Manager<CityManager>.Initialize();
@@ -200,9 +201,10 @@ namespace VoxelMultiplayer.Injections
                 Client.serverStarted = true;
 
                 // Send map data to server
-                ExtendedSaveMetadata _save = SaveManager.Autosave();
+                /*ExtendedSaveMetadata _save = SaveManager.Autosave();
+                Debug.LogError(SaveManager.SavesDirectory + " " + _save.Filename);
                 Network.ServerPeer.ReceiveLatestMap(File.ReadAllBytes(SaveManager.SavesDirectory + "/" + _save.Filename));
-                File.Delete(SaveManager.SavesDirectory + "/" + _save.Filename);
+                File.Delete(SaveManager.SavesDirectory + "/" + _save.Filename);*/
             }
             else if (LazyManager<TutorialManager>.Current.Tutorial != null)
             {
